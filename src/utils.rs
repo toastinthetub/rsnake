@@ -10,18 +10,26 @@ use std::{
 };
 
 pub const ANSII_RED: &str = "\x1b[1;31m";
-// other ansii colors soon
-
+pub const ANSII_GREEN: &str = "\x1b[1;32m";
+pub const ANSII_YELLOW: &str = "\x1b[1;33m";
+pub const ANSII_BLUE: &str = "\x1b[1;34m";
+pub const ANSII_MAGENTA: &str = "\x1b[1;35m";
+pub const ANSII_CYAN: &str = "\x1b[1;36m";
+pub const ANSII_WHITE: &str = "\x1b[1;37m";
 pub const ANSII_RESET: &str = "\x1b[0m";
 
-const BOX_CHAR: &str = "█";
+pub const BOX_CHAR: &str = "█";
 
 pub enum AnsiiColor {
     Red,
-    // more soon
+    Green,
+    Yellow,
+    Blue,
+    Magenta,
+    Cyan,
+    White,
     Reset,
 }
-
 pub enum IsVertical {
     Yes,
     No,

@@ -1,4 +1,4 @@
-use crate::game::{Direction /*Game*/};
+use crate::{draw_cell_arbitrary, game::Direction};
 // use crossterm::{
 //     cursor::MoveTo,
 //     style::{Color, ResetColor, SetBackgroundColor, SetForegroundColor, Stylize},
@@ -51,6 +51,14 @@ impl SnakeHead {
             position: Position::new(),
         }
     }
+    pub fn draw(&mut self) {
+        let mut stdout = std::io::stdout();
+        draw_cell_arbitrary(
+            &mut stdout,
+            crate::utils::AnsiiColor::Blue,
+            self.position.xy,
+        )
+    }
 }
 
 impl SnakeBlock {
@@ -59,6 +67,14 @@ impl SnakeBlock {
         Self {
             position: Position::new(),
         }
+    }
+    pub fn draw(&mut self) {
+        let mut stdout = std::io::stdout();
+        draw_cell_arbitrary(
+            &mut stdout,
+            crate::utils::AnsiiColor::White,
+            self.position.xy,
+        )
     }
 }
 
@@ -73,7 +89,7 @@ impl Snake {
         }
     }
     pub fn update_snake(
-        mut self,
+        &mut self,
         /* stdout: &mut Stdout, */ direction: Direction,
         size: (u16, u16),
     ) {
@@ -146,5 +162,12 @@ impl Snake {
             }
             Direction::NoDirection => {}
         }
+    }
+    pub fn draw_snake(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+        self.head.draw();
+        self.body.iter_mut().for_each(|element| {
+            element.draw();
+        });
+        Ok(())
     }
 }

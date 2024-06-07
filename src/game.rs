@@ -72,10 +72,14 @@ impl<'a> Game<'a> {
         let _ = self.screen.update_screen_size();
         let _ = self.screen.create_border(stdout);
         match direction {
-            Some(d) => self.snake.update_snake(d, (self.screen.w, self.screen.h)),
+            Some(d) => {
+                self.snake.update_snake(d, (self.screen.w, self.screen.h)) // i cant remember what i was doing i fucked myself
+            }
             None => self
                 .snake
-                .update_snake(Direction::NoDirection, (self.screen.w, self.screen.h)),
+                .update_snake(Direction::NoDirection, (self.screen.w, self.screen.h)), // fuck, i thought this fucntion needed to own self...
+                                                                                       // i think that means something is fucked up
         }
     }
+    pub fn draw_shit(&mut self, mut stdout: &mut Stdout) -> Result<(), Box<dyn Error>> {}
 }

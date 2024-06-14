@@ -1,4 +1,14 @@
-use crate::{draw_cell_arbitrary, game::Direction};
+use crossterm::{
+    cursor::MoveTo,
+    terminal::{Clear, ClearType},
+    QueueableCommand,
+};
+use std::io::{stdout, Write};
+
+use crate::{
+    draw_cell_arbitrary,
+    game::{Direction, SNAKE_STEP},
+};
 // use crossterm::{
 //     cursor::MoveTo,
 //     style::{Color, ResetColor, SetBackgroundColor, SetForegroundColor, Stylize},
@@ -38,9 +48,12 @@ impl Position {
     // empty position
     pub fn new() -> Self {
         Self {
-            xy: (0, 0),
-            last_xy: (0, 0),
+            xy: (2, 2),
+            last_xy: (1, 1),
         }
+    }
+    pub fn from_xy(xy: (u16, u16), last_xy: (u16, u16)) -> Self {
+        Self { xy, last_xy }
     }
 }
 
@@ -66,6 +79,11 @@ impl SnakeBlock {
     pub fn new() -> Self {
         Self {
             position: Position::new(),
+        }
+    }
+    pub fn at_position(xy: (u16, u16)) -> Self {
+        Self {
+            position: Position::from_xy(xy, (xy.0 - 1, xy.1 - 1)),
         }
     }
     pub fn draw(&mut self) {
@@ -97,11 +115,18 @@ impl Snake {
         // this is bad i know passing a field of an object on the same level but bear with me
         if self.head.position.xy.0 >= size.0 // if head has hit rightmost wall
             || self.head.position.xy.0 <= 0 // if head has hit leftmost wall
-            || self.head.position.xy.1 <= size.1 // if head has hit bottom (highest y value)
-            || self.head.position.xy.1 >= 0
+            || self.head.position.xy.1 >= size.1 // if head has hit bottom (highest y value)
+            || self.head.position.xy.1 <= 0
         // if head has top... lowest y value? but for some reason compiler says this is wrong
         {
             self.alive = false;
+            crossterm::terminal::disable_raw_mode().unwrap();
+            let mut stdout = std::io::stdout();
+            let _ = stdout.queue(Clear(ClearType::All));
+            let _ = stdout.flush();
+            println!("{:?}", size);
+            println!("{:?}", self);
+            std::process::exit(0);
         }
         match direction {
             Direction::North => {
@@ -157,7 +182,6 @@ impl Snake {
                     snake_block.position.xy = xy_prev;
                     xy_prev = current_xy;
                 }
-
                 self.length = self.body.len() as i32;
             }
             Direction::NoDirection => {}
@@ -168,6 +192,11 @@ impl Snake {
         self.body.iter_mut().for_each(|element| {
             element.draw();
         });
+        Ok(())
+    }
+    pub fn eat_food(&mut self, xy: (u16, u16)) -> Result<(), Box<dyn std::error::Error>> {
+        self.length += 1;
+        self.body.push(SnakeBlock::at_position(xy));
         Ok(())
     }
 }

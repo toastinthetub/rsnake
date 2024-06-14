@@ -5,8 +5,11 @@ use crossterm::{
     QueueableCommand,
 };
 use std::{
+    env::current_exe,
     error::Error,
     io::{Stdout, Write},
+    thread,
+    time::{self, Duration},
 };
 
 pub const ANSII_RED: &str = "\x1b[1;31m";
@@ -19,6 +22,7 @@ pub const ANSII_WHITE: &str = "\x1b[1;37m";
 pub const ANSII_RESET: &str = "\x1b[0m";
 
 pub const BOX_CHAR: &str = "█";
+pub const SNAKE_STEP: u16 = 2;
 
 pub enum AnsiiColor {
     Red,
@@ -80,10 +84,22 @@ impl ScreenConstruct<'_> {
         let bnr_color_on = match bnr_color_on {
             AnsiiColor::Red => ANSII_RED,
             AnsiiColor::Reset => ANSII_RESET,
+            AnsiiColor::Green => ANSII_GREEN,
+            AnsiiColor::Yellow => ANSII_YELLOW,
+            AnsiiColor::Blue => ANSII_BLUE,
+            AnsiiColor::Magenta => ANSII_MAGENTA,
+            AnsiiColor::Cyan => ANSII_CYAN,
+            AnsiiColor::White => ANSII_WHITE,
         };
         let bnr_color_reset = match bnr_color_reset {
             AnsiiColor::Red => ANSII_RED,
             AnsiiColor::Reset => ANSII_RESET,
+            AnsiiColor::Green => ANSII_GREEN,
+            AnsiiColor::Yellow => ANSII_YELLOW,
+            AnsiiColor::Blue => ANSII_BLUE,
+            AnsiiColor::Magenta => ANSII_MAGENTA,
+            AnsiiColor::Cyan => ANSII_CYAN,
+            AnsiiColor::White => ANSII_WHITE,
         };
 
         Ok((
@@ -111,10 +127,22 @@ impl ScreenConstruct<'_> {
         let bnr_color_on = match bnr_color_on {
             AnsiiColor::Red => ANSII_RED,
             AnsiiColor::Reset => ANSII_RESET,
+            AnsiiColor::Green => ANSII_GREEN,
+            AnsiiColor::Yellow => ANSII_YELLOW,
+            AnsiiColor::Blue => ANSII_BLUE,
+            AnsiiColor::Magenta => ANSII_MAGENTA,
+            AnsiiColor::Cyan => ANSII_CYAN,
+            AnsiiColor::White => ANSII_WHITE,
         };
         let bnr_color_reset = match bnr_color_reset {
             AnsiiColor::Red => ANSII_RED,
             AnsiiColor::Reset => ANSII_RESET,
+            AnsiiColor::Green => ANSII_GREEN,
+            AnsiiColor::Yellow => ANSII_YELLOW,
+            AnsiiColor::Blue => ANSII_BLUE,
+            AnsiiColor::Magenta => ANSII_MAGENTA,
+            AnsiiColor::Cyan => ANSII_CYAN,
+            AnsiiColor::White => ANSII_WHITE,
         };
 
         (self.w, self.h) = (w, h);
@@ -130,6 +158,7 @@ impl ScreenConstruct<'_> {
     pub fn prime_scr(&mut self, stdout: &mut Stdout) -> Result<(), Box<dyn Error>> {
         let _ = crossterm::terminal::enable_raw_mode();
         let _ = execute!(stdout, cursor::DisableBlinking);
+        let _ = execute!(stdout, cursor::Hide);
         let _ = stdout.queue(Clear(ClearType::All));
         let _ = stdout.flush().unwrap();
         Ok(())
@@ -138,6 +167,7 @@ impl ScreenConstruct<'_> {
         let _ = stdout.queue(Clear(ClearType::All));
         let _ = crossterm::terminal::disable_raw_mode();
         let _ = execute!(stdout, cursor::EnableBlinking);
+        let _ = execute!(stdout, cursor::Show);
         Ok(())
     }
     pub fn update_screen_size(&mut self) -> Result<(), Box<dyn Error>> {
@@ -224,7 +254,6 @@ impl ScreenConstruct<'_> {
     }
 }
 
-// built in, fast, generic UI elements
 impl ScreenConstruct<'_> {
     pub fn create_border(&mut self, stdout: &mut Stdout) -> Result<(), Box<dyn Error>> {
         self.create_bar(
@@ -248,7 +277,7 @@ impl ScreenConstruct<'_> {
             0,
             Some(self.h),
             Some(self.w), // this is fucking confusing why did i do this
-            Some(243),
+            Some(277),
         )
         .unwrap();
         self.create_bar(
@@ -260,7 +289,7 @@ impl ScreenConstruct<'_> {
             0,
             Some(0),
             Some(self.w),
-            Some(254),
+            Some(289),
         )
         .unwrap();
         self.create_bar(
@@ -272,9 +301,13 @@ impl ScreenConstruct<'_> {
             self.w - 2,
             Some(0),
             Some(self.h),
-            Some(265),
+            Some(301),
         )
         .unwrap();
+        Ok(())
+    }
+    pub fn menu(&mut self, stdout: &mut Stdout) -> Result<(), Box<dyn Error>> {
+        let _ = self.create_border(stdout);
         Ok(())
     }
 }

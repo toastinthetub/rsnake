@@ -1,13 +1,13 @@
 mod game;
-mod listener;
 mod snake;
 mod utils;
 
 use crossterm::{cursor::MoveTo, QueueableCommand};
 use std::io::{Stdout, Write};
+use utils::{ANSII_BLUE, ANSII_GREEN, ANSII_WHITE};
 
 use crate::{
-    game::{Game, IsQuit},
+    game::{Food, Game, IsQuit},
     snake::Snake,
     utils::{AnsiiColor, ScreenConstruct, ANSII_RED, ANSII_RESET},
 };
@@ -28,7 +28,8 @@ fn main() -> Result<(), ()> {
 
     let _ = screen.prime_scr(&mut stdout);
     let snake = Snake::new();
-    let mut game = Game::instantiate_game(screen.clone(), snake);
+    let food = Food::generate_random_food().unwrap();
+    let mut game = Game::instantiate_game(screen.clone(), snake, food);
 
     let mut quit: bool = false;
 
@@ -60,8 +61,11 @@ pub fn draw_cell_arbitrary(stdout: &mut Stdout, color: AnsiiColor, position: (u1
             AnsiiColor::Red => {
                 ANSII_RED
             }
+            AnsiiColor::White => {
+                ANSII_WHITE
+            }
             _ => {
-                ANSII_RED // ansii red for now
+                ANSII_BLUE // ansii red for now
             }
         },
         BOX_CHAR,
